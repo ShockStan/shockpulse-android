@@ -1,0 +1,211 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidTransaction(data, userId) {
+      return data.keys().hasAll([
+        'userId', 'title', 'amountCents', 'type', 'status', 'category',
+        'paymentMethodId', 'paymentMethodLabel', 'sourceType',
+        'linkedMessageId', 'linkedMessageSnippet', 'linkedSender',
+        'itemsBoughtSummary', 'billPaid', 'billReference',
+        'transactionDateMillis', 'monthKey', 'notes', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'userId', 'title', 'amountCents', 'type', 'status', 'category',
+        'paymentMethodId', 'paymentMethodLabel', 'sourceType',
+        'linkedMessageId', 'linkedMessageSnippet', 'linkedSender',
+        'itemsBoughtSummary', 'billPaid', 'billReference',
+        'transactionDateMillis', 'monthKey', 'notes', 'createdAt', 'updatedAt'
+      ]) &&
+      data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+      data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+      data.amountCents is int && data.amountCents > 0 && data.amountCents <= 100000000000 &&
+      data.type is string && data.type in ['EXPENSE', 'INCOME', 'BILL_PAID'] &&
+      data.status is string && data.status in ['PENDING', 'APPROVED', 'REJECTED'] &&
+      data.category is string && data.category.size() >= 1 && data.category.size() <= 60 &&
+      data.paymentMethodId is string && data.paymentMethodId.size() <= 128 &&
+      data.paymentMethodLabel is string && data.paymentMethodLabel.size() <= 100 &&
+      data.sourceType is string && data.sourceType in ['MANUAL', 'SMS', 'EMAIL'] &&
+      data.linkedMessageId is string && data.linkedMessageId.size() <= 128 &&
+      data.linkedMessageSnippet is string && data.linkedMessageSnippet.size() <= 600 &&
+      data.linkedSender is string && data.linkedSender.size() <= 120 &&
+      data.itemsBoughtSummary is string && data.itemsBoughtSummary.size() <= 600 &&
+      data.billPaid is bool &&
+      data.billReference is string && data.billReference.size() <= 120 &&
+      data.transactionDateMillis is int && data.transactionDateMillis > 0 &&
+      data.monthKey is string && data.monthKey.size() == 7 && data.monthKey.matches('^[0-9]{4}-[0-9]{2}$') &&
+      data.notes is string && data.notes.size() <= 500 &&
+      data.createdAt is timestamp && data.createdAt <= request.time &&
+      data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidPaymentMethod(data, userId) {
+      return data.keys().hasAll([
+        'userId', 'name', 'institution', 'methodType', 'lastFourDigits',
+        'networkOrRouting', 'limitOrBalanceCents', 'colorHex', 'defaultMethod',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'userId', 'name', 'institution', 'methodType', 'lastFourDigits',
+        'networkOrRouting', 'limitOrBalanceCents', 'colorHex', 'defaultMethod',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+      data.name is string && data.name.size() >= 1 && data.name.size() <= 80 &&
+      data.institution is string && data.institution.size() >= 1 && data.institution.size() <= 80 &&
+      data.methodType is string && data.methodType in ['CREDIT_CARD', 'DEBIT_CARD', 'BANK_ACCOUNT', 'DIGITAL_WALLET'] &&
+      data.lastFourDigits is string && data.lastFourDigits.size() <= 4 &&
+      data.networkOrRouting is string && data.networkOrRouting.size() <= 40 &&
+      data.limitOrBalanceCents is int && data.limitOrBalanceCents >= 0 && data.limitOrBalanceCents <= 100000000000 &&
+      data.colorHex is string && data.colorHex.size() == 7 &&
+      data.defaultMethod is bool &&
+      data.createdAt is timestamp && data.createdAt <= request.time &&
+      data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidCategoryBudget(data, userId) {
+      return data.keys().hasAll([
+        'userId', 'category', 'monthlyLimitCents', 'alertThresholdPercent',
+        'monthKey', 'alertsEnabled', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'userId', 'category', 'monthlyLimitCents', 'alertThresholdPercent',
+        'monthKey', 'alertsEnabled', 'createdAt', 'updatedAt'
+      ]) &&
+      data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+      data.category is string && data.category.size() >= 1 && data.category.size() <= 60 &&
+      data.monthlyLimitCents is int && data.monthlyLimitCents > 0 && data.monthlyLimitCents <= 100000000000 &&
+      data.alertThresholdPercent is int && data.alertThresholdPercent >= 10 && data.alertThresholdPercent <= 100 &&
+      data.monthKey is string && data.monthKey.size() == 7 && data.monthKey.matches('^[0-9]{4}-[0-9]{2}$') &&
+      data.alertsEnabled is bool &&
+      data.createdAt is timestamp && data.createdAt <= request.time &&
+      data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidParsedMessage(data, userId) {
+      return data.keys().hasAll([
+        'userId', 'sourceType', 'sender', 'subject', 'body',
+        'detectedAmountCents', 'detectedMerchant', 'detectedCategory',
+        'detectedLastFour', 'detectedType', 'detectedItems',
+        'linkedTransactionId', 'approvalStatus', 'receivedAtMillis',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'userId', 'sourceType', 'sender', 'subject', 'body',
+        'detectedAmountCents', 'detectedMerchant', 'detectedCategory',
+        'detectedLastFour', 'detectedType', 'detectedItems',
+        'linkedTransactionId', 'approvalStatus', 'receivedAtMillis',
+        'createdAt', 'updatedAt'
+      ]) &&
+      data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+      data.sourceType is string && data.sourceType in ['SMS', 'EMAIL'] &&
+      data.sender is string && data.sender.size() >= 1 && data.sender.size() <= 120 &&
+      data.subject is string && data.subject.size() <= 200 &&
+      data.body is string && data.body.size() >= 1 && data.body.size() <= 1000 &&
+      data.detectedAmountCents is int && data.detectedAmountCents >= 0 && data.detectedAmountCents <= 100000000000 &&
+      data.detectedMerchant is string && data.detectedMerchant.size() <= 120 &&
+      data.detectedCategory is string && data.detectedCategory.size() <= 60 &&
+      data.detectedLastFour is string && data.detectedLastFour.size() <= 4 &&
+      data.detectedType is string && data.detectedType in ['EXPENSE', 'INCOME', 'BILL_PAID'] &&
+      data.detectedItems is string && data.detectedItems.size() <= 500 &&
+      data.linkedTransactionId is string && data.linkedTransactionId.size() <= 128 &&
+      data.approvalStatus is string && data.approvalStatus in ['PENDING', 'APPROVED', 'REJECTED'] &&
+      data.receivedAtMillis is int && data.receivedAtMillis > 0 &&
+      data.createdAt is timestamp && data.createdAt <= request.time &&
+      data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    match /users/{userId} {
+      match /transactions/{transactionId} {
+        allow get: if isOwner(userId) && isValidId(transactionId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(transactionId) && isValidTransaction(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(transactionId) &&
+                         isValidTransaction(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'title', 'amountCents', 'type', 'status', 'category',
+                           'paymentMethodId', 'paymentMethodLabel', 'sourceType',
+                           'linkedMessageId', 'linkedMessageSnippet', 'linkedSender',
+                           'itemsBoughtSummary', 'billPaid', 'billReference',
+                           'transactionDateMillis', 'monthKey', 'notes', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(transactionId);
+      }
+
+      match /payment_methods/{methodId} {
+        allow get: if isOwner(userId) && isValidId(methodId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(methodId) && isValidPaymentMethod(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(methodId) &&
+                         isValidPaymentMethod(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'name', 'institution', 'methodType', 'lastFourDigits',
+                           'networkOrRouting', 'limitOrBalanceCents', 'colorHex',
+                           'defaultMethod', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(methodId);
+      }
+
+      match /budgets/{budgetId} {
+        allow get: if isOwner(userId) && isValidId(budgetId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(budgetId) && isValidCategoryBudget(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(budgetId) &&
+                         isValidCategoryBudget(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'category', 'monthlyLimitCents', 'alertThresholdPercent',
+                           'monthKey', 'alertsEnabled', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(budgetId);
+      }
+
+      match /parsed_messages/{messageId} {
+        allow get: if isOwner(userId) && isValidId(messageId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(messageId) && isValidParsedMessage(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(messageId) &&
+                         isValidParsedMessage(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'sourceType', 'sender', 'subject', 'body',
+                           'detectedAmountCents', 'detectedMerchant', 'detectedCategory',
+                           'detectedLastFour', 'detectedType', 'detectedItems',
+                           'linkedTransactionId', 'approvalStatus', 'receivedAtMillis',
+                           'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(messageId);
+      }
+    }
+  }
+}

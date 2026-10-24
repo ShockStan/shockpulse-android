@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="360dp"
+    android:height="180dp"
+    android:viewportWidth="360"
+    android:viewportHeight="180">
+    <!-- Deep Emerald Atmospheric Backdrop -->
+    <path android:pathData="M0,0h360v180h-360z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="0"
+                android:startY="0"
+                android:endX="360"
+                android:endY="180"
+                android:type="linear">
+                <item android:color="#06221B" android:offset="0.0" />
+                <item android:color="#0B3B2E" android:offset="0.55" />
+                <item android:color="#115E49" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Subtle decorative grid rings -->
+    <path
+        android:fillColor="#1434D399"
+        android:pathData="M290,30m-80,0a80,80 0,1 1,160 0a80,80 0,1 1,-160 0" />
+    <path
+        android:fillColor="#1A34D399"
+        android:pathData="M60,150m-65,0a65,65 0,1 1,130 0a65,65 0,1 1,-130 0" />
+    <!-- Floating Glass Credit Card -->
+    <path
+        android:fillColor="#1E293B"
+        android:pathData="M34,36h136c6.6,0 12,5.4 12,12v76c0,6.6 -5.4,12 -12,12H34c-6.6,0 -12,-5.4 -12,-12V48c0,-6.6 5.4,-12 12,-12z" />
+    <path
+        android:fillColor="#34D399"
+        android:pathData="M22,54h160v14H22z" />
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M38,82h24v16H38z" />
+    <path
+        android:fillColor="#94A3B8"
+        android:pathData="M38,110h76v6H38z" />
+    <!-- Message / Email Receipt Card Overlapping -->
+    <path
+        android:fillColor="#0F2922"
+        android:strokeColor="#34D399"
+        android:strokeWidth="1.5"
+        android:pathData="M158,26h168c5.5,0 10,4.5 10,10v96c0,5.5 -4.5,10 -10,10H158c-5.5,0 -10,-4.5 -10,-10V36c0,-5.5 4.5,-10 10,-10z" />
+    <!-- Receipt Lines & Approval Badge -->
+    <path
+        android:fillColor="#34D399"
+        android:pathData="M166,44h74v8H166z" />
+    <path
+        android:fillColor="#A7F3D0"
+        android:pathData="M166,62h124v6H166z" />
+    <path
+        android:fillColor="#A7F3D0"
+        android:pathData="M166,76h98v6H166z" />
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M166,94h64v8H166z" />
+    <!-- Rising Trend Bars -->
+    <path
+        android:fillColor="#34D399"
+        android:pathData="M268,112h10v16h-10zM284,100h10v28h-10zM300,84h10v44h-10z" />
+    <!-- Checkmark Approval Circle -->
+    <path
+        android:fillColor="#34D399"
+        android:pathData="M304,50m-14,0a14,14 0,1 1,28 0a14,14 0,1 1,-28 0" />
+    <path
+        android:fillColor="#06221B"
+        android:pathData="M301.5,55.2l-5.2,-5.2l2.1,-2.1l3.1,3.1l7.1,-7.1l2.1,2.1z" />
+</vector>

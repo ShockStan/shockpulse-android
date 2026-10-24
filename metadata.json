@@ -1,0 +1,6 @@
+{
+  "name": "ShockPulse",
+  "description": "Smart finance tracker that parses messages and emails into pending transactions for approval, tracks cards, bank accounts, bills, budgets, and exports monthly PDF spending reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

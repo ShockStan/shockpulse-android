@@ -1,0 +1,348 @@
+{
+  "entities": {
+    "Transaction": {
+      "title": "Transaction",
+      "description": "A financial transaction extracted from SMS/Email (pending or approved) or manually entered by the user, with linked message, payment method, items bought, and bill status.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the authenticated owner."
+        },
+        "title": {
+          "type": "string",
+          "description": "Merchant, payee, or transaction title."
+        },
+        "amountCents": {
+          "type": "integer",
+          "description": "Transaction amount in cents (> 0)."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["EXPENSE", "INCOME", "BILL_PAID"],
+          "description": "Type of financial transaction."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PENDING", "APPROVED", "REJECTED"],
+          "description": "Approval state of the transaction."
+        },
+        "category": {
+          "type": "string",
+          "description": "Spending or income category."
+        },
+        "paymentMethodId": {
+          "type": "string",
+          "description": "ID of linked payment method or empty string."
+        },
+        "paymentMethodLabel": {
+          "type": "string",
+          "description": "Display label of the linked card, bank account, or wallet."
+        },
+        "sourceType": {
+          "type": "string",
+          "enum": ["MANUAL", "SMS", "EMAIL"],
+          "description": "Origin channel of the transaction."
+        },
+        "linkedMessageId": {
+          "type": "string",
+          "description": "ID of linked ParsedMessage document or empty string."
+        },
+        "linkedMessageSnippet": {
+          "type": "string",
+          "description": "Excerpt of the SMS message or email linked to this transaction."
+        },
+        "linkedSender": {
+          "type": "string",
+          "description": "Sender phone/shortcode or email address."
+        },
+        "itemsBoughtSummary": {
+          "type": "string",
+          "description": "Semicolon-separated or formatted list of items bought."
+        },
+        "billPaid": {
+          "type": "boolean",
+          "description": "True if this transaction represents a bill payment."
+        },
+        "billReference": {
+          "type": "string",
+          "description": "Invoice or bill account reference."
+        },
+        "transactionDateMillis": {
+          "type": "integer",
+          "description": "Epoch milliseconds when the transaction occurred."
+        },
+        "monthKey": {
+          "type": "string",
+          "description": "Year-month key in YYYY-MM format for monthly PDF reporting."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional user notes."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "title",
+        "amountCents",
+        "type",
+        "status",
+        "category",
+        "paymentMethodId",
+        "paymentMethodLabel",
+        "sourceType",
+        "linkedMessageId",
+        "linkedMessageSnippet",
+        "linkedSender",
+        "itemsBoughtSummary",
+        "billPaid",
+        "billReference",
+        "transactionDateMillis",
+        "monthKey",
+        "notes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PaymentMethod": {
+      "title": "PaymentMethod",
+      "description": "A user's credit card, debit card, bank account, or digital wallet.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the authenticated owner."
+        },
+        "name": {
+          "type": "string",
+          "description": "Nickname of the card or bank account."
+        },
+        "institution": {
+          "type": "string",
+          "description": "Issuing bank or financial institution."
+        },
+        "methodType": {
+          "type": "string",
+          "enum": ["CREDIT_CARD", "DEBIT_CARD", "BANK_ACCOUNT", "DIGITAL_WALLET"],
+          "description": "Category of payment method."
+        },
+        "lastFourDigits": {
+          "type": "string",
+          "description": "Last 4 digits of card or account number."
+        },
+        "networkOrRouting": {
+          "type": "string",
+          "description": "Card network (Visa/Mastercard/Amex) or account subtype (Checking/Savings)."
+        },
+        "limitOrBalanceCents": {
+          "type": "integer",
+          "description": "Credit limit or account balance in cents."
+        },
+        "colorHex": {
+          "type": "string",
+          "description": "Hex color code for card visual."
+        },
+        "defaultMethod": {
+          "type": "boolean",
+          "description": "Whether this is the user's primary payment method."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "name",
+        "institution",
+        "methodType",
+        "lastFourDigits",
+        "networkOrRouting",
+        "limitOrBalanceCents",
+        "colorHex",
+        "defaultMethod",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "CategoryBudget": {
+      "title": "CategoryBudget",
+      "description": "Personalized monthly spending limit and alert threshold for a category.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the authenticated owner."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category name being budgeted."
+        },
+        "monthlyLimitCents": {
+          "type": "integer",
+          "description": "Monthly budget cap in cents (> 0)."
+        },
+        "alertThresholdPercent": {
+          "type": "integer",
+          "description": "Percentage (10..100) at which budget alert triggers."
+        },
+        "monthKey": {
+          "type": "string",
+          "description": "Month key in YYYY-MM format."
+        },
+        "alertsEnabled": {
+          "type": "boolean",
+          "description": "Whether personalized alerts are active for this category."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "category",
+        "monthlyLimitCents",
+        "alertThresholdPercent",
+        "monthKey",
+        "alertsEnabled",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ParsedMessage": {
+      "title": "ParsedMessage",
+      "description": "An SMS message or email scanned or imported for transaction tracking and linking.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the authenticated owner."
+        },
+        "sourceType": {
+          "type": "string",
+          "enum": ["SMS", "EMAIL"],
+          "description": "Whether the message came from SMS or Email."
+        },
+        "sender": {
+          "type": "string",
+          "description": "Sender phone number, bank ID, or email address."
+        },
+        "subject": {
+          "type": "string",
+          "description": "Email subject line or SMS label."
+        },
+        "body": {
+          "type": "string",
+          "description": "Raw message or email body excerpt."
+        },
+        "detectedAmountCents": {
+          "type": "integer",
+          "description": "Parsed amount in cents."
+        },
+        "detectedMerchant": {
+          "type": "string",
+          "description": "Parsed merchant or biller name."
+        },
+        "detectedCategory": {
+          "type": "string",
+          "description": "Auto-categorized spending category."
+        },
+        "detectedLastFour": {
+          "type": "string",
+          "description": "Detected last 4 digits of card or bank account."
+        },
+        "detectedType": {
+          "type": "string",
+          "enum": ["EXPENSE", "INCOME", "BILL_PAID"],
+          "description": "Detected transaction type."
+        },
+        "detectedItems": {
+          "type": "string",
+          "description": "Detected items bought or bill details."
+        },
+        "linkedTransactionId": {
+          "type": "string",
+          "description": "ID of transaction linked to this message/email."
+        },
+        "approvalStatus": {
+          "type": "string",
+          "enum": ["PENDING", "APPROVED", "REJECTED"],
+          "description": "Current user review status."
+        },
+        "receivedAtMillis": {
+          "type": "integer",
+          "description": "Epoch milliseconds when message/email was received."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "sourceType",
+        "sender",
+        "subject",
+        "body",
+        "detectedAmountCents",
+        "detectedMerchant",
+        "detectedCategory",
+        "detectedLastFour",
+        "detectedType",
+        "detectedItems",
+        "linkedTransactionId",
+        "approvalStatus",
+        "receivedAtMillis",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/Transaction" },
+      "description": "Per-user financial transactions (both pending approval from SMS/Email and approved/manual transactions)."
+    },
+    "/users/{userId}/payment_methods/{methodId}": {
+      "schema": { "$ref": "#/entities/PaymentMethod" },
+      "description": "Per-user saved cards, bank accounts, and digital wallets."
+    },
+    "/users/{userId}/budgets/{budgetId}": {
+      "schema": { "$ref": "#/entities/CategoryBudget" },
+      "description": "Per-user category monthly budgets and personalized alert thresholds."
+    },
+    "/users/{userId}/parsed_messages/{messageId}": {
+      "schema": { "$ref": "#/entities/ParsedMessage" },
+      "description": "Per-user parsed SMS messages and emails linked to or awaiting approval as transactions."
+    }
+  }
+}

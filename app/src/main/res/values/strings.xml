@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">ShockPulse</string>
+    <string name="tagline">Smart Message &amp; Email Transaction Ledger</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="auth_subtitle">Automatically parse SMS &amp; email receipts into an approval queue, track cards &amp; bank accounts, set category budget alerts, and export monthly PDF reports.</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_overview">Dashboard</string>
+    <string name="nav_inbox">Approvals</string>
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_ledger">Transactions</string>
+    <string name="nav_wallet">Wallet</string>
+    <string name="nav_reports">Reports</string>
+    <string name="nav_budgets">Reports</string>
+    <string name="export_pdf_report">Export Monthly PDF Report</string>
+    <string name="add_transaction">Add Transaction</string>
+    <string name="parse_message_email">Scan / Paste SMS or Email</string>
+    <string name="load_sample_inbox">Scan Sample Bank SMS &amp; Emails</string>
+    <string name="approve_transaction">Approve &amp; Record</string>
+    <string name="reject_transaction">Dismiss</string>
+    <string name="add_payment_method">Add Card or Bank Account</string>
+    <string name="add_budget_alert">Set Category Budget Alert</string>
+    <string name="sign_out">Sign Out</string>
+</resources>
